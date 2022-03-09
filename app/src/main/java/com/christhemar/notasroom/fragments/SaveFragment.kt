@@ -38,6 +38,7 @@ class SaveFragment : Fragment() {
             helper=context?.let {
                 Room.databaseBuilder(it,NotaDB::class.java,NotaDB.DB_NAME).allowMainThreadQueries().build()
             }!!
+
         }
 
     }
@@ -54,12 +55,19 @@ class SaveFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val titulo=view.findViewById<EditText>(R.id.s_titulo)
         val texto=view.findViewById<EditText>(R.id.s_texto)
-        //val modalBottomSheet:ModalBottomSheet
 
-        /*
-        BottomSheetBehavior.from(sheetBottom_colors).apply {
-            this.state=BottomSheetBehavior.STATE_COLLAPSED
-        }*/
+        //Obtener argumentos
+        val bundle=arguments
+
+        if(bundle!=null){
+            val id=requireArguments().getInt("id")
+            lifecycleScope.launch {
+                val notaOb= withContext(Dispatchers.IO){helper.notaDao.findById(id)}
+                titulo.append(notaOb.titulo)
+                texto.append(notaOb.texto)
+            }
+        }
+
 
         toolbarSave.setNavigationOnClickListener {
             volver()
@@ -69,14 +77,25 @@ class SaveFragment : Fragment() {
             when(item.itemId){
                 R.id.guardar->{
                     if(validar(titulo.text.trim().toString(),texto.text.trim().toString())){
-                        lifecycleScope.launch {
-                            var longitudUltima:Int= withContext(Dispatchers.IO){ helper.notaDao.lastId() }
-                            var idAuto=longitudUltima+1
-                            val fecha=obtenerHechaActual()
-                            val nota=Nota(idAuto,titulo.text.trim().toString(),texto.text.trim().toString(),fecha,0)
-                            withContext(Dispatchers.IO){ helper.notaDao.insert(nota) }
-                            volver()
+                        if(arguments==null){
+                            lifecycleScope.launch {
+                                //val longitudUltima:Int= withContext(Dispatchers.IO){ helper.notaDao.lastId() }
+                                //var idAuto=longitudUltima+1
+                                val fecha=obtenerHechaActual()
+                                val nota=Nota(0,titulo.text.trim().toString(),texto.text.trim().toString(),fecha,0)
+                                withContext(Dispatchers.IO){ helper.notaDao.insert(nota) }
+                                volver()
+                            }
+                        }else{
+                            lifecycleScope.launch {
+                                val id=requireArguments().getInt("id")
+                                val fecha=obtenerHechaActual()
+                                val notaUpdate=Nota(id,titulo.text.trim().toString(),texto.text.trim().toString(),fecha,0)
+                                withContext(Dispatchers.IO){ helper.notaDao.update(notaUpdate) }
+                                volver()
+                            }
                         }
+
                     }else{
                         Toast.makeText(context, "Ingrese su texto", Toast.LENGTH_SHORT).show()
                     }
@@ -97,7 +116,9 @@ class SaveFragment : Fragment() {
     private fun mostrarDialog() {
         val dialog = context?.let { Dialog(it) }
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        //Indicando contenido
         dialog?.setContentView(R.layout.modal_bottom)
+        //Obteniendo vistas del conteinido
         val tituloD = dialog!!.findViewById<TextView>(R.id.dialog_title)
         val img = dialog.findViewById<ImageView>(R.id.dialog_img)
 
@@ -105,11 +126,18 @@ class SaveFragment : Fragment() {
             Toast.makeText(context, "Presiono imagen", Toast.LENGTH_SHORT).show()
         }
 
+        tituloD.setOnClickListener {
+            Toast.makeText(context, "Presiono Titulo", Toast.LENGTH_SHORT).show()
+        }
+
         dialog.show()
         //Ancho y alto
         dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT)
+        //Color de fondo del Dialog
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.WHITE))
+        //Animaciones implementadas en style
         dialog.window!!.attributes.windowAnimations=R.style.DialogAnimation
+        //Indicando hubicacion del dialog
         dialog.window!!.setGravity(Gravity.BOTTOM)
     }
 
@@ -134,16 +162,3 @@ class SaveFragment : Fragment() {
 
 }
 
-class ModalBottomSheet : BottomSheetDialogFragment(){
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View?=inflater.inflate(R.layout.modal_bottom,container,false)
-
-    companion object{
-        const val TAG="ModalBottomSheet"
-    }
-
-}

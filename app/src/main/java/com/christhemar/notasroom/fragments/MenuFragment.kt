@@ -2,14 +2,14 @@ package com.christhemar.notasroom.fragments
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.Toast
+import android.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +20,7 @@ import com.christhemar.notasroom.R
 import com.christhemar.notasroom.adapter.NotaAdapter
 import com.christhemar.notasroom.db.Nota
 import com.christhemar.notasroom.db.NotaDB
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_menu.*
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +45,7 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         rv.layoutManager=LinearLayoutManager(context)
+        setUpToolbar(view)
 
         //Data - RecyclerView
         //Predeterminadamente usa el Disp.Main
@@ -58,6 +60,15 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
             direccionar()
         }
 
+    }
+
+    //Metodo para que funciones el buscar - Necesario
+    private fun setUpToolbar(view: View) {
+        val toolbar=view.findViewById<MaterialToolbar>(R.id.toolbarMenu)
+        val activity=activity  as AppCompatActivity
+        if(activity!=null){
+            activity.setSupportActionBar(toolbar)
+        }
     }
 
     fun direccionar(){
@@ -115,6 +126,33 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
             rv.adapter=NotaAdapter(helper.notaDao.getAll(), { nota -> obtenerNota(nota)},{nota->elimnarNota(nota)})
         }
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+
+        inflater.inflate(R.menu.toolbar_menu,menu)
+        val menuItem=menu.findItem(R.id.buscar)
+        val searchView:SearchView=menuItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object:SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                val listaFiltrada=listaNotas.filter {
+                    it.titulo.toLowerCase().contains(newText!!.toLowerCase())
+                }
+                lifecycleScope.launch {
+                    rv.adapter=NotaAdapter(listaFiltrada, { nota -> obtenerNota(nota)},{nota->elimnarNota(nota)})
+                }
+
+                return false
+            }
+
+        })
+
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     /*

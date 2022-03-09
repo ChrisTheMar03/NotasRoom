@@ -84,7 +84,6 @@ class SaveFragment : Fragment() {
                                 val fecha=obtenerHechaActual()
                                 val nota=Nota(0,titulo.text.trim().toString(),texto.text.trim().toString(),fecha,0)
                                 withContext(Dispatchers.IO){ helper.notaDao.insert(nota) }
-                                volver()
                             }
                         }else{
                             lifecycleScope.launch {
@@ -92,13 +91,12 @@ class SaveFragment : Fragment() {
                                 val fecha=obtenerHechaActual()
                                 val notaUpdate=Nota(id,titulo.text.trim().toString(),texto.text.trim().toString(),fecha,0)
                                 withContext(Dispatchers.IO){ helper.notaDao.update(notaUpdate) }
-                                volver()
                             }
                         }
-
                     }else{
                         Toast.makeText(context, "Ingrese su texto", Toast.LENGTH_SHORT).show()
                     }
+                    volver()
                     true
                 }
                 R.id.colorSave->{
@@ -145,7 +143,7 @@ class SaveFragment : Fragment() {
         //Saca el estado superior de la pila posterior. Esta función es asincrónica: pone en
         // cola la solicitud para que aparezca, pero la acción no se realizará hasta que
         // la aplicación vuelva a su bucle de eventos.
-        activity?.supportFragmentManager!!.popBackStack()
+        parentFragmentManager.popBackStack()
     }
 
     fun validar(titulo:String,texto:String):Boolean{
@@ -159,6 +157,8 @@ class SaveFragment : Fragment() {
     fun obtenerHechaActual():String{
         return SimpleDateFormat("yyyy-MM-dd").format(Date()).toString()
     }
+
+
 
 }
 

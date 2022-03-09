@@ -55,4 +55,6 @@
         android:hint="Empiece a Escribir"
         android:inputType="text|textAutoCorrect|textAutoComplete|textMultiLine"/>
 
+
+
 </LinearLayout>

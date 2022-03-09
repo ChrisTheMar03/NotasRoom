@@ -1,11 +1,14 @@
 package com.christhemar.notasroom.fragments
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
@@ -13,6 +16,8 @@ import androidx.room.Room
 import com.christhemar.notasroom.R
 import com.christhemar.notasroom.db.Nota
 import com.christhemar.notasroom.db.NotaDB
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_save.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -49,6 +54,12 @@ class SaveFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val titulo=view.findViewById<EditText>(R.id.s_titulo)
         val texto=view.findViewById<EditText>(R.id.s_texto)
+        //val modalBottomSheet:ModalBottomSheet
+
+        /*
+        BottomSheetBehavior.from(sheetBottom_colors).apply {
+            this.state=BottomSheetBehavior.STATE_COLLAPSED
+        }*/
 
         toolbarSave.setNavigationOnClickListener {
             volver()
@@ -64,6 +75,7 @@ class SaveFragment : Fragment() {
                             val fecha=obtenerHechaActual()
                             val nota=Nota(idAuto,titulo.text.trim().toString(),texto.text.trim().toString(),fecha,0)
                             withContext(Dispatchers.IO){ helper.notaDao.insert(nota) }
+                            volver()
                         }
                     }else{
                         Toast.makeText(context, "Ingrese su texto", Toast.LENGTH_SHORT).show()
@@ -71,13 +83,34 @@ class SaveFragment : Fragment() {
                     true
                 }
                 R.id.colorSave->{
-                    Toast.makeText(context, "Paleta de colores", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(context, "Paleta de colores", Toast.LENGTH_SHORT).show()
+                    mostrarDialog()
+
                     true
                 }
                 else -> {false}
             }
         }
 
+    }
+
+    private fun mostrarDialog() {
+        val dialog = context?.let { Dialog(it) }
+        dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog?.setContentView(R.layout.modal_bottom)
+        val tituloD = dialog!!.findViewById<TextView>(R.id.dialog_title)
+        val img = dialog.findViewById<ImageView>(R.id.dialog_img)
+
+        img.setOnClickListener {
+            Toast.makeText(context, "Presiono imagen", Toast.LENGTH_SHORT).show()
+        }
+
+        dialog.show()
+        //Ancho y alto
+        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.WHITE))
+        dialog.window!!.attributes.windowAnimations=R.style.DialogAnimation
+        dialog.window!!.setGravity(Gravity.BOTTOM)
     }
 
     fun volver(){
@@ -97,6 +130,20 @@ class SaveFragment : Fragment() {
 
     fun obtenerHechaActual():String{
         return SimpleDateFormat("yyyy-MM-dd").format(Date()).toString()
+    }
+
+}
+
+class ModalBottomSheet : BottomSheetDialogFragment(){
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View?=inflater.inflate(R.layout.modal_bottom,container,false)
+
+    companion object{
+        const val TAG="ModalBottomSheet"
     }
 
 }

@@ -1,12 +1,15 @@
 package com.christhemar.notasroom.fragments
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
@@ -28,7 +31,6 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-
         GlobalScope.launch(Dispatchers.IO) {
             helper= context?.let { Room.databaseBuilder(it,NotaDB::class.java,NotaDB.DB_NAME).allowMainThreadQueries().build() }!!
         }
@@ -71,9 +73,14 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
     }
 
 
-    fun mostrar(){
-        //val nota=helper.notaDao.findById(1)
-        //Toast.makeText(context, "Datos: ${nota.titulo}", Toast.LENGTH_SHORT).show()
-    }
+    /*
+    fun ocultarTeclado(){
+        val view:View?=activity?.currentFocus
+        if(view != null){
+            val inputStream=activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputStream.hideSoftInputFromWindow(view.windowToken,0)
+        }
+
+    }*/
 
 }

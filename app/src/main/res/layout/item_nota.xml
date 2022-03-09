@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="5dp"
+        app:cardCornerRadius="10dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginHorizontal="12dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/item_titulo"
+                android:padding="10dp"
+                android:textColor="@color/bonito"
+                android:alpha="0.6"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Titulo de ejemplo"
+                />
+            <TextView
+                android:id="@+id/item_texto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="100dp"
+                android:maxHeight="110dp"
+                android:padding="10dp"
+                android:textSize="15sp"
+                android:text="Hola mundo somos los profestas de las cosas dque pasan en la elite mundial de todo lso dias"
+                />
+            <!--android:inputType="text|textAutoCorrect|textAutoComplete|textMultiLine" -->
+            <TextView
+                android:id="@+id/item_fecha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:text="2021-05-10"
+                android:letterSpacing="0.1"
+                android:gravity="end"
+                android:paddingHorizontal="10dp"
+                />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

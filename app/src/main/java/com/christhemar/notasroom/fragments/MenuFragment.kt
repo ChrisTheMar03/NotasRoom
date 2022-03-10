@@ -22,6 +22,8 @@ import com.christhemar.notasroom.db.Nota
 import com.christhemar.notasroom.db.NotaDB
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialSharedAxis
 import kotlinx.android.synthetic.main.fragment_menu.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -35,6 +37,9 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //Salida transition
+        sharedElementEnterTransition=MaterialContainerTransform()
+
         setHasOptionsMenu(true)
         GlobalScope.launch(Dispatchers.IO) {
             helper= context?.let { Room.databaseBuilder(it,NotaDB::class.java,NotaDB.DB_NAME).allowMainThreadQueries().build() }!!
@@ -57,7 +62,7 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
 
         //Redireccionar
         btnSave.setOnClickListener {
-            direccionar()
+            direccionar(it)
         }
 
     }
@@ -71,10 +76,12 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
         }
     }
 
-    fun direccionar(){
+    fun direccionar(view:View){
         activity?.supportFragmentManager!!
             .beginTransaction()
-            .setCustomAnimations(R.anim.anim_dentro,R.anim.anim_salida,R.anim.anim_pop_dentro,R.anim.anim_pop_fuera)
+            .setReorderingAllowed(true)
+            .addSharedElement(view,"shared_container")
+            //.setCustomAnimations(R.anim.anim_dentro,R.anim.anim_salida,R.anim.anim_pop_dentro,R.anim.anim_pop_fuera)
             .replace(R.id.container,SaveFragment())
             .addToBackStack(null)
             .commit()
@@ -95,6 +102,7 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
 
         activity?.supportFragmentManager!!
             .beginTransaction()
+            //.addSharedElement(view,"shared_container")
             .setCustomAnimations(R.anim.anim_dentro,R.anim.anim_salida,R.anim.anim_pop_dentro,R.anim.anim_pop_fuera)
             .replace(R.id.container,SaveFragment::class.java,bundle)
             .addToBackStack(null)
@@ -154,15 +162,5 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
 
         super.onCreateOptionsMenu(menu, inflater)
     }
-
-    /*
-    fun ocultarTeclado(){
-        val view:View?=activity?.currentFocus
-        if(view != null){
-            val inputStream=activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputStream.hideSoftInputFromWindow(view.windowToken,0)
-        }
-
-    }*/
 
 }

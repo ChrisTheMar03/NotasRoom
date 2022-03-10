@@ -23,6 +23,7 @@ class NotaViewHolder(view:View) : RecyclerView.ViewHolder(view) {
             setOnClickListener(nota)
         }
 
+
         cardview.setOnLongClickListener(object:View.OnLongClickListener{
             override fun onLongClick(p0: View?): Boolean {
                 onLongClickListener(nota)

@@ -18,6 +18,8 @@ import com.christhemar.notasroom.db.Nota
 import com.christhemar.notasroom.db.NotaDB
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialSharedAxis
 import kotlinx.android.synthetic.main.fragment_save.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -32,8 +34,12 @@ class SaveFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
+        //Animaciones de entrada y salida
+        sharedElementEnterTransition=MaterialContainerTransform()
 
+        exitTransition=MaterialSharedAxis(MaterialSharedAxis.Z,true)
+
+        setHasOptionsMenu(true)
         GlobalScope.launch(Dispatchers.IO) {
             helper=context?.let {
                 Room.databaseBuilder(it,NotaDB::class.java,NotaDB.DB_NAME).allowMainThreadQueries().build()
@@ -84,6 +90,7 @@ class SaveFragment : Fragment() {
                                 val fecha=obtenerHechaActual()
                                 val nota=Nota(0,titulo.text.trim().toString(),texto.text.trim().toString(),fecha,0)
                                 withContext(Dispatchers.IO){ helper.notaDao.insert(nota) }
+                                volver()
                             }
                         }else{
                             lifecycleScope.launch {
@@ -91,12 +98,12 @@ class SaveFragment : Fragment() {
                                 val fecha=obtenerHechaActual()
                                 val notaUpdate=Nota(id,titulo.text.trim().toString(),texto.text.trim().toString(),fecha,0)
                                 withContext(Dispatchers.IO){ helper.notaDao.update(notaUpdate) }
+                                volver()
                             }
                         }
                     }else{
                         Toast.makeText(context, "Ingrese su texto", Toast.LENGTH_SHORT).show()
                     }
-                    volver()
                     true
                 }
                 R.id.colorSave->{
